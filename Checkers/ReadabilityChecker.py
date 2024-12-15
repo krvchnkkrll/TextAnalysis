@@ -1,7 +1,7 @@
 import re
 
 
-class ReadabilityAnalyzer:
+class ReadabilityChecker:
     def count_syllables(self, word):
         word = word.lower()
         vowels = "аеёиоуыэюя"
@@ -44,4 +44,4 @@ class ReadabilityAnalyzer:
             return 1, "Очень сложный текст"
 
 
-ReadabilityChecker = ReadabilityAnalyzer()
+ReadabilityChecker = ReadabilityChecker()

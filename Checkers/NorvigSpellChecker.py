@@ -33,11 +33,38 @@ class NorvigSpellChecker:
         candidates = self._candidates(word)
         return max(candidates, key=lambda w: self.word_freq.get(w[0].upper(), []).count(w))
 
+    def _levenshtein_distance(self, word1, word2):
+        # Вычисление расстояния Левенштейна
+        len1, len2 = len(word1), len(word2)
+        dp = [[0] * (len2 + 1) for _ in range(len1 + 1)]
+
+        for i in range(len1 + 1):
+            for j in range(len2 + 1):
+                if i == 0:
+                    dp[i][j] = j
+                elif j == 0:
+                    dp[i][j] = i
+                elif word1[i - 1] == word2[j - 1]:
+                    dp[i][j] = dp[i - 1][j - 1]
+                else:
+                    dp[i][j] = 1 + min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1])
+
+        return dp[len1][len2]
+
     def analyze_text(self, text):
         words = re.findall(r'\b\w+\b', text.lower())
         misspelled = {word for word in words if word not in self.words_set}
 
-        corrections = {word: self.correction(word) for word in sorted(misspelled)}
+        corrections = {}
+        error_counts = []
+
+        for word in words:
+            if word in misspelled:
+                corrected_word = self.correction(word)
+                corrections[word] = corrected_word
+                error_counts.append(self._levenshtein_distance(word, corrected_word))
+            else:
+                error_counts.append(0)
 
         total_words = len(words)
         correct_words = total_words - len(misspelled)
@@ -52,5 +79,6 @@ class NorvigSpellChecker:
         return {
             "accuracy": accuracy,
             "misspelled_words": corrections,
+            "error_counts": error_counts,
             "corrected_text": corrected_text
         }

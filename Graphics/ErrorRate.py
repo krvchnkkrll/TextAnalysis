@@ -9,7 +9,7 @@ class ErrorRatePlotter:
         self.error_counts = error_counts
 
     def plot(self):
-        plt.figure(figsize=(10, 6))
+        plt.figure(figsize=(20, 6))
         plt.plot(
             range(1, len(self.error_counts) + 1),
             self.error_counts,
